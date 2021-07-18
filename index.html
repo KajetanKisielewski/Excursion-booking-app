@@ -1,24 +1,39 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>JavaScript: Formularze - devmentor.pl</title>
-    <link rel="stylesheet" href="./assets/css/style.css" />
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>JavaScript: Formularze - devmentor.pl</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <script src="https://kit.fontawesome.com/a15a7d638f.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+  <div class="wrap">
     <section class="panel">
+
       <ul class="panel__excursions excursions">
-        <li class="excursions__item excursions__item--prototype">
+        <li class="excursions__item excursions__item--prototype excursions__item--current">
+
           <header class="excursions__header">
-            <h2 class="excursions__title">Ogrodzieniec</h2>
+            <h2 class="excursions__title">
+              <span class="excursions__nav excursions__nav--next"><i class="fas fa-arrow-right"></i></span>
+              <span class="excursions__title--content">Ogrodzieniec</span>
+              <span class="excursions__nav excursions__nav--prev"><i class="fas fa-arrow-left"></i></span>
+            </h2>
             <p class="excursions__description">
               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet
               aliquam quam laboriosam quaerat temporibus dicta vitae maxime!
               Nemo, nobis veritatis?
             </p>
           </header>
+
           <form class="excursions__form">
             <div class="excursions__field">
               <label class="excursions__field-name">
@@ -33,15 +48,13 @@
               </label>
             </div>
             <div class="excursions__field excursions__field--submit">
-              <input
-                class="excursions__field-input excursions__field-input--submit"
-                value="dodaj do zamówinia"
-                type="submit"
-              />
+              <button class="excursions__field-input excursions__field-input--submit button" type="submit">Dodaj do
+                zamówinia</button>
             </div>
           </form>
         </li>
       </ul>
+
       <section class="panel__form">
         <div class="panel__uploader uploader">
           <label class="uploader__label">
@@ -65,13 +78,13 @@
             </label>
           </div>
           <div class="order__field order__field--submit">
-            <input
-              class="order__field-input order__field-submit"
-              value="zamawiam"
-              type="submit"
-            />
+            <button class="order__field-input order__field-submit button" value="zamawiam"
+              type="submit">Zamawiam</button>
           </div>
         </form>
+
+
+
         <ul class="panel__summary summary">
           <li class="summary__item summary__item--prototype">
             <h3 class="summary__title">
@@ -79,12 +92,17 @@
               <strong class="summary__total-price">199PLN</strong>
               <a href="" class="summary__btn-remove" title="usuń">X</a>
             </h3>
-            <p class="summary__prices">dorośli: 1 x 99PLN, dzieci: 2 x 50PLN</p>
+            <p class="summary__prices">
+              <span class="summary__prices--adults">Dorosły: 1 x 99PLN</span>
+              <span class="summary__prices--children">Dziecko: 2 x 50PLN</span>
+            </p>
           </li>
         </ul>
       </section>
     </section>
+  </div>
 
-    <script src="./assets/js/script.js"></script>
-  </body>
+  <script src="./assets/js/script.js"></script>
+</body>
+
 </html>
