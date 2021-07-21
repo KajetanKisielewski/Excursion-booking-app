@@ -15,8 +15,8 @@
     align-items: center;
     flex-wrap: nowrap;
     max-width: 1920px;
-    height: 100vh;
-    background-image: url(../img/island1.jpg);
+    min-height: 100vh;
+    background-image: url(../img/island.jpg);
     background-repeat: no-repeat;
     background-position: bottom left;
     background-size: cover;
@@ -24,35 +24,33 @@
 
 .panel {
     display: flex;
-    justify-content: space-between;
-    /* align-items: center; */
+    justify-content: flex-end;
     width: 100%;
     max-width: 1200px;
-    height: 80vh;
+    max-height: 100vh;
+    height: 85vh;
 }
 
 .panel__excursions {
-    display: flex;
-    flex-wrap: wrap;
+    display: none;
     width: 30%;
     border: 2px solid #0956A1;
-    border-radius: 15px;
+    border-radius: 1.5rem;
     list-style: none;
     background-color: rgba(255, 255, 255, 0.3);
 }
 
 .excursions__item {
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: space-between;
-    margin: 10px;
-    padding: 20px;
+    margin: 1rem;
+    padding: 2rem;
 }
 
 .excursions__item--current {
-    display: block;
+    display: flex
 }
-
 
 .excursions__title {
     position: relative;
@@ -78,7 +76,7 @@
 }
 
 .excursions__description {
-    margin-top: 4rem;
+    margin: 4rem 0;
     font-size: 1.5rem;
     text-align: center;
 }
@@ -168,13 +166,56 @@
 
 
 .summary {
-    list-style: none;
+    max-height: 30%;
+    padding: 0.5rem;
     font-size: 2rem;
     text-align: center;
+    list-style: none;
+    overflow-y: scroll;
+}
+
+.summary__item--prototype {
+    display: none;
+}
+
+.summary__item--current {
+    display: list-item;
+}
+
+.summary__item {
+    margin: 2rem;
+    padding: 1rem 1.5rem;
+    border: 1px solid #0956A1;
+}
+
+.summary__title {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.summary__name {
+    padding-right: 0.5rem;
+}
+
+.summary__name,
+.summary__total-price {
+    font-size: 2rem;
+}
+
+.summary__btn-remove {
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: black;
+    padding: 0 0 0 0.5rem;
+}
+
+.summary__prices {
+    display: flex;
+    flex-direction: column;
 }
 
 .summary__prices--adults,
 .summary__prices--children {
-    margin-top: 2rem;
-    display: inline-block;
+    font-size: 1.5rem;
+    display: block;
 }
