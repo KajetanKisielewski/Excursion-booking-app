@@ -2,16 +2,16 @@ document.addEventListener('DOMContentLoaded', init);
 let cart = [];
 
 function init() {
+
     const fileEl = document.querySelector('.uploader__input');
-    fileEl.addEventListener('change' , readFile);
-
     const excursions = document.querySelector('.panel__excursions');
+    const summary = document.querySelector('.panel__form')
+
+    fileEl.addEventListener('change' , readFile);
     excursions.addEventListener('click' , selectExcursion);
-
     excursions.addEventListener('submit' , summaryDetails);
+    summary.addEventListener('click' , removeExcursion);
 }
-
-
 
 function readFile(e) {
     const file = e.target.files[0];
@@ -27,7 +27,7 @@ function readFile(e) {
             rowsInContent.forEach( function(element) {
                 const excursion = element.substr(1, element.length-2).split(/["+"]\W+/);
                 setExcursionDetails(excursion);
-            } )
+            } );
             showCurrentExcursion();
         };
         reader.readAsText(file, 'UTF-8');
@@ -42,19 +42,19 @@ function setExcursionDetails(item) {
     const excursionDetailsPrototype = document.querySelector('.excursions__item');
 
     const excursionDetails = excursionDetailsPrototype.cloneNode(true);
-    excursionDetails.classList.remove('excursions__item--prototype' , 'excursions__item--current');
+    excursionDetails.classList.remove('excursions__item--prototype');
     excursionDetails.dataset.id = item[0];
 
     const excursionTitle = excursionDetails.querySelector('.excursions__title--content');
-    excursionTitle.innerText = item[1]
+    excursionTitle.innerText = item[1];
 
     const excursionDescription = excursionDetails.querySelector('.excursions__description');
-    excursionDescription.innerText = item[2]
+    excursionDescription.innerText = item[2];
 
     const excursionPrice = excursionDetails.querySelectorAll('.excursions__price');
 
     const excursionAdultPrice = excursionPrice[0];
-    excursionAdultPrice.innerText = item[3]
+    excursionAdultPrice.innerText = item[3];
 
     const excursionChildrenPrice = excursionPrice[1];
     excursionChildrenPrice.innerText = item[4];
@@ -75,6 +75,7 @@ function showCurrentExcursion() {
 }
 
 function selectExcursion(e) {
+
     if(e.target.classList.contains('fa-arrow-right')) {
         selectNextExcursion();
     }
@@ -82,6 +83,8 @@ function selectExcursion(e) {
     if(e.target.classList.contains('fa-arrow-left')) {
         selectPreviousExcursion();
     }
+
+    clearErrorsInExcursionPanel();
 }
 
 function selectNextExcursion() {
@@ -123,78 +126,155 @@ function selectPreviousExcursion() {
 function summaryDetails(e) {
     e.preventDefault();
 
-    getCurrentExcursionDetails();
-    setSummaryDetails(cart)
-    setOrderTotalPrice(cart);
+    if( getCurrentExcursionDetails() ) {
+        addExcursion(cart);
+        setOrderTotalPrice(cart);
+    }
 }
 
 function getCurrentExcursionDetails() {
 
+    clearErrorsInExcursionPanel();
+
     const currentExcursion = document.querySelector('.excursions__item--current');
 
-    currentExcursionName = currentExcursion.querySelector('.excursions__title--content').innerText;
+    const currentExcursionName = currentExcursion.querySelector('.excursions__title--content').innerText;
 
-    currentExcursionPrices = currentExcursion.querySelectorAll('.excursions__price');
-    currentExcursionAdultPrice = currentExcursionPrices[0].innerText;
-    currentExcursionChildrenPrice = currentExcursionPrices[1].innerText;
+    const currentExcursionPrices = currentExcursion.querySelectorAll('.excursions__price');
+    const currentExcursionAdultPrice = currentExcursionPrices[0].innerText;
+    const currentExcursionChildrenPrice = currentExcursionPrices[1].innerText;
 
-    currentExcursionAdultNumber = currentExcursion.querySelector('[name=adults]').value;
-    currentExcursionChildrenNumber = currentExcursion.querySelector('[name=children]').value;
+    const currentExcursionAdultNumber = currentExcursion.querySelector('[name=adults]');
+    const currentExcursionAdultNumberValue = currentExcursionAdultNumber.value;
 
-    const currentExcursionDetails =
-    {
+    const currentExcursionChildrenNumber = currentExcursion.querySelector('[name=children]')
+    const currentExcursionChildrenNumberValue = currentExcursionChildrenNumber.value;
+
+     if( isNumber(currentExcursionAdultNumberValue) === false || currentExcursionAdultNumberValue.trim() === '') {
+        addErrorInExcursionPanel(currentExcursionAdultNumber.parentElement , 'Number of adult must be integer number');
+     }
+
+     if( isNumber(currentExcursionChildrenNumberValue) === false || currentExcursionChildrenNumberValue.trim() === '' ) {
+        addErrorInExcursionPanel(currentExcursionChildrenNumber.parentElement , 'Number of children must be integer number');
+     }
+
+    if ( isNumber(currentExcursionAdultNumberValue) === true && isNumber(currentExcursionChildrenNumberValue) === true ){
+
+        const currentExcursionDetails =
+        {
         title: currentExcursionName,
         adultPrice: currentExcursionAdultPrice,
-        adultNumber: currentExcursionAdultNumber,
+        adultNumber: currentExcursionAdultNumberValue,
         childPrice: currentExcursionChildrenPrice,
-        childNumber: currentExcursionChildrenNumber,
+        childNumber: currentExcursionChildrenNumberValue,
+        }
+
+        cart.push(currentExcursionDetails);
+
+        return true
     }
 
-    cart.push(currentExcursionDetails);
-
 }
 
-function setSummaryDetails(item) {
+function isNumber(item) {
+
+    const itemWithoutWhiteSpaces = item.trim();
+
+    if( itemWithoutWhiteSpaces.length !== 0 ) {
+
+        const num = Number( item );
+
+        if( !Number.isNaN(num) && Number.isInteger(num) && num >= 0 ) {
+            return true;
+        }
+        else{
+            return false;
+        }
+}
+}
+
+
+function addErrorInExcursionPanel(item, errorText) {
+   item.parentElement.setAttribute('data-content' , errorText);
+}
+
+function clearErrorsInExcursionPanel() {
+
+   const errorList = document.querySelectorAll('[data-content]');
+
+   errorList.forEach( function(el) {
+       el.dataset.content = ""
+   })
+}
+
+function addExcursion(item) {
     const summaryDetailsPrototype = document.querySelector('.summary__item--prototype');
+
     const summaryDetails = summaryDetailsPrototype.cloneNode(true);
     summaryDetails.classList.remove('summary__item--prototype');
-    summaryDetails.classList.add('summary__item--current')
 
-    const summaryName = document.querySelector('.summary__name');
+    const summaryName = summaryDetails.querySelector('.summary__name');
     summaryName.innerText = item[item.length - 1].title
 
-    const summaryAdultsPrices = document.querySelector('.summary__prices--adults');
+    const summaryAdultsPrices = summaryDetails.querySelector('.summary__prices--adults');
     summaryAdultsPrices.innerText = `Dorosły: ${item[item.length - 1].adultNumber} x ${item[item.length - 1].adultPrice} PLN`
 
-    const summaryChildrenPrices = document.querySelector('.summary__prices--children');
+    const summaryChildrenPrices = summaryDetails.querySelector('.summary__prices--children');
     summaryChildrenPrices.innerText = `Dziecko: ${item[item.length - 1].childNumber} x ${item[item.length - 1].childPrice} PLN`
 
+    const summaryTotalPrice = summaryDetails.querySelector('.summary__total-price');
 
-    const summaryTotalPrice = document.querySelector('.summary__total-price');
-
-    const CalculatedTotalPrice =
-
-     item[item.length - 1].adultNumber * item[item.length - 1].adultPrice + item[item.length - 1].childNumber * item[item.length - 1].childPrice;
+    const CalculatedTotalPrice = item[item.length - 1].adultNumber * item[item.length - 1].adultPrice + item[item.length - 1].childNumber * item[item.length - 1].childPrice;
 
     summaryTotalPrice.innerText = `${CalculatedTotalPrice} PLN`;
-    console.log(summaryTotalPrice);
-    console.log(CalculatedTotalPrice);
 
-    console.log(summaryDetails)
     summaryDetailsPrototype.parentElement.appendChild(summaryDetails);
+
+    schowSummary();
 }
 
-
-
-
+function schowSummary() {
+    document.querySelector('.summary').style.display = 'block';
+    document.querySelector('.order').style.display = 'block';
+}
 
 function setOrderTotalPrice(item) {
-
-    let orderTotalPrice = document.querySelector('.order__total-price-value');
+    const orderTotalPrice = document.querySelector('.order__total-price-value');
     let price = "";
 
    for(let i=0; i<item.length; i++) {
        price = parseInt(price + (item[i].adultPrice * item[i].adultNumber + item[i].childPrice * item[i].childNumber));
     }
-    orderTotalPrice.innerText = price;
+    orderTotalPrice.innerText = `${price} PLN`;
 }
+
+function removeExcursion(e) {
+    if( e.target.classList.contains('summary__btn-remove') ) {
+        // const orderTotalPrice = document.querySelector('.order__total-price-value');
+        const orderTotalPriceValue = document.querySelector('.order__total-price-value').innerText;
+        console.log(orderTotalPriceValue)
+
+        const deletedExcursionPrice = e.target.previousElementSibling.innerText
+        const deletedExcursionPriceValue = deletedExcursionPrice.substr(0, deletedExcursionPrice.length - 4);
+
+        const orderTotalPrice = document.querySelector('.order__total-price-value')
+        orderTotalPrice.innerText = parseInt(orderTotalPriceValue - deletedExcursionPriceValue);
+
+        e.target.parentElement.parentElement.remove();
+
+
+        const allExcusionInSummary = document.querySelectorAll('.summary__item');
+        const allExcusionInSummaryWithoutPrototype = allExcusionInSummary.removeChild(allExcusionInSummary.firstElementChild)
+    }
+}
+
+function orderFormValidate() {
+
+    const nameInputValue = document.querySelector('[name=name]').value;
+    const emailInputValue = document.querySelector('[name=email]').value;
+
+    const regEmail = /.+@.+\.[a-z]{2,}/
+
+    if( regEmail.test(emailInputValue) === true || nameInputValue.length > 0) {}
+}
+
