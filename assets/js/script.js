@@ -167,6 +167,7 @@ function getCurrentExcursionDetails() {
         adultNumber: currentExcursionAdultNumberValue,
         childPrice: currentExcursionChildrenPrice,
         childNumber: currentExcursionChildrenNumberValue,
+        id: Math.round( Math.random() * 10000 ),
         }
 
         cart.push(currentExcursionDetails);
@@ -212,6 +213,7 @@ function addExcursion(item) {
 
     const summaryDetails = summaryDetailsPrototype.cloneNode(true);
     summaryDetails.classList.remove('summary__item--prototype');
+    summaryDetails.dataset.id = item[item.length - 1].id;
 
     const summaryName = summaryDetails.querySelector('.summary__name');
     summaryName.innerText = item[item.length - 1].title
@@ -250,21 +252,43 @@ function setOrderTotalPrice(item) {
 
 function removeExcursion(e) {
     if( e.target.classList.contains('summary__btn-remove') ) {
+
+        // console.log(e.target)
+        // console.log(e.target.parentElement)
+        // console.log(e.target.parentElement.parentElement)
+        console.log(e.target.parentElement.parentElement.dataset.id)
+        console.log(typeof e.target.parentElement.parentElement.dataset.id)
+        // console.log(e.currentTarget)
+
+
         // const orderTotalPrice = document.querySelector('.order__total-price-value');
-        const orderTotalPriceValue = document.querySelector('.order__total-price-value').innerText;
-        console.log(orderTotalPriceValue)
+        // const orderTotalPriceValue = document.querySelector('.order__total-price-value').innerText;
+        // console.log(orderTotalPriceValue)
 
-        const deletedExcursionPrice = e.target.previousElementSibling.innerText
-        const deletedExcursionPriceValue = deletedExcursionPrice.substr(0, deletedExcursionPrice.length - 4);
+        // const deletedExcursionPrice = e.target.previousElementSibling.innerText
+        // const deletedExcursionPriceValue = deletedExcursionPrice.substr(0, deletedExcursionPrice.length - 4);
 
-        const orderTotalPrice = document.querySelector('.order__total-price-value')
-        orderTotalPrice.innerText = parseInt(orderTotalPriceValue - deletedExcursionPriceValue);
-
-        e.target.parentElement.parentElement.remove();
+        // orderTotalPrice.innerText = parseInt(orderTotalPriceValue - deletedExcursionPriceValue);
 
 
-        const allExcusionInSummary = document.querySelectorAll('.summary__item');
-        const allExcusionInSummaryWithoutPrototype = allExcusionInSummary.removeChild(allExcusionInSummary.firstElementChild)
+        for(const el in cart) {
+            console.log( el );
+            console.log( typeof el );
+            console.log( cart[el] );
+            console.log( typeof cart[el] );
+            console.log( cart[el].id );
+            console.log( typeof cart[el].id );
+
+            if( cart[el].id === parseInt( e.target.parentElement.parentElement.dataset.id) ) {
+
+              cart.removeChild( cart[el] )
+            }
+
+        }
+
+
+
+        // e.target.parentElement.parentElement.remove();
     }
 }
 
