@@ -315,8 +315,7 @@ function orderFormValidate() {
 function clearOrderFormField() {
     const nameInputValue = document.querySelector('[name=name]').value = "";
     const emailInputValue = document.querySelector('[name=email]').value = "";
-
-    cart = []
+    cart = [];
 }
 
 function clearExcursionListInSummary() {
