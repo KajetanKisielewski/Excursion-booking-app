@@ -94,8 +94,8 @@
 }
 
 
-.excursions__field::after {
-    content: attr(data-content);
+.excursions__field::after,
+.order__field::after {
     display: block;
     position: absolute;
     bottom: -100%;
@@ -105,6 +105,14 @@
     font-size: 1.5rem;
     text-align: right;
     color: var(--alert-color);
+}
+
+.excursions__field::after {
+    content: attr(data-excursion-content);
+}
+
+.order__field::after {
+    content: attr(data-order-content)
 }
 
 .excursions__field-name {
@@ -158,6 +166,7 @@
     border: 2px solid var(--main-color);
     border-radius: 15px;
     background-color: var(--panel-color);
+    overflow: hidden;
 }
 
 
@@ -183,7 +192,11 @@
 
 .order__total-price,
 .order__field {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.order__field {
+    position: relative;
 }
 
 .order__field--submit {

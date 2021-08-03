@@ -9,8 +9,9 @@ function init() {
 
     fileEl.addEventListener('change' , readFile);
     excursions.addEventListener('click' , selectExcursion);
-    excursions.addEventListener('submit' , summaryDetails);
+    excursions.addEventListener('submit' , setSummaryDetails);
     summary.addEventListener('click' , removeExcursion);
+    summary.addEventListener('submit' , sendOrder)
 }
 
 function readFile(e) {
@@ -84,7 +85,7 @@ function selectExcursion(e) {
         selectPreviousExcursion();
     }
 
-    clearErrorsInExcursionPanel();
+    clearErrors('[data-excursion-content]');
 }
 
 function selectNextExcursion() {
@@ -123,18 +124,18 @@ function selectPreviousExcursion() {
     }
 }
 
-function summaryDetails(e) {
+function setSummaryDetails(e) {
     e.preventDefault();
 
     if( getCurrentExcursionDetails() ) {
-        addExcursion(cart);
+        addExcursionIntoSummary(cart);
         setOrderTotalPrice(cart);
     }
 }
 
 function getCurrentExcursionDetails() {
 
-    clearErrorsInExcursionPanel();
+    clearErrors('[data-excursion-content]');
 
     const currentExcursion = document.querySelector('.excursions__item--current');
 
@@ -151,11 +152,11 @@ function getCurrentExcursionDetails() {
     const currentExcursionChildrenNumberValue = currentExcursionChildrenNumber.value;
 
      if( isNumber(currentExcursionAdultNumberValue) === false || currentExcursionAdultNumberValue.trim() === '') {
-        addErrorInExcursionPanel(currentExcursionAdultNumber.parentElement , 'Number of adult must be integer number');
+        addError(currentExcursionAdultNumber.parentElement , 'Number of adult must be integer number' , 'data-excursion-content');
      }
 
      if( isNumber(currentExcursionChildrenNumberValue) === false || currentExcursionChildrenNumberValue.trim() === '' ) {
-        addErrorInExcursionPanel(currentExcursionChildrenNumber.parentElement , 'Number of children must be integer number');
+        addError(currentExcursionChildrenNumber.parentElement , 'Number of children must be integer number' , 'data-excursion-content');
      }
 
     if ( isNumber(currentExcursionAdultNumberValue) === true && isNumber(currentExcursionChildrenNumberValue) === true ){
@@ -194,21 +195,28 @@ function isNumber(item) {
 }
 }
 
-
-function addErrorInExcursionPanel(item, errorText) {
-   item.parentElement.setAttribute('data-content' , errorText);
+function addError(item, errorText, dataName) {
+   item.parentElement.setAttribute(dataName , errorText);
 }
 
-function clearErrorsInExcursionPanel() {
+function clearErrors(data) {
 
-   const errorList = document.querySelectorAll('[data-content]');
+    const errorList = document.querySelectorAll(data);
 
-   errorList.forEach( function(el) {
-       el.dataset.content = ""
-   })
+    if( data === '[data-excursion-content]') {
+       errorList.forEach( function(el) {
+           el.dataset.excursionContent = ""
+        })
+    }
+
+    if( data === '[data-order-content]') {
+       errorList.forEach( function(el) {
+           el.dataset.orderContent = ""
+        })
+   }
 }
 
-function addExcursion(item) {
+function addExcursionIntoSummary(item) {
     const summaryDetailsPrototype = document.querySelector('.summary__item--prototype');
 
     const summaryDetails = summaryDetailsPrototype.cloneNode(true);
@@ -253,52 +261,74 @@ function setOrderTotalPrice(item) {
 function removeExcursion(e) {
     if( e.target.classList.contains('summary__btn-remove') ) {
 
-        // console.log(e.target)
-        // console.log(e.target.parentElement)
-        // console.log(e.target.parentElement.parentElement)
-        console.log(e.target.parentElement.parentElement.dataset.id)
-        console.log(typeof e.target.parentElement.parentElement.dataset.id)
-        // console.log(e.currentTarget)
-
-
-        // const orderTotalPrice = document.querySelector('.order__total-price-value');
-        // const orderTotalPriceValue = document.querySelector('.order__total-price-value').innerText;
-        // console.log(orderTotalPriceValue)
-
-        // const deletedExcursionPrice = e.target.previousElementSibling.innerText
-        // const deletedExcursionPriceValue = deletedExcursionPrice.substr(0, deletedExcursionPrice.length - 4);
-
-        // orderTotalPrice.innerText = parseInt(orderTotalPriceValue - deletedExcursionPriceValue);
-
+        const deletedExcursionId = parseInt(e.target.parentElement.parentElement.dataset.id);
 
         for(const el in cart) {
-            console.log( el );
-            console.log( typeof el );
-            console.log( cart[el] );
-            console.log( typeof cart[el] );
-            console.log( cart[el].id );
-            console.log( typeof cart[el].id );
-
-            if( cart[el].id === parseInt( e.target.parentElement.parentElement.dataset.id) ) {
-
-              cart.removeChild( cart[el] )
+            if( cart[el].id === deletedExcursionId ) {
+              cart.splice(el , 1)
+              setOrderTotalPrice(cart);
             }
-
         }
+        e.target.parentElement.parentElement.remove();
+    }
+}
 
+function sendOrder(e) {
+    e.preventDefault()
 
+    const orderTotalValue = document.querySelector('.order__total-price-value').innerText
+    const userEmail = document.querySelector('[name=email]').value;
 
-        // e.target.parentElement.parentElement.remove();
+    if ( orderFormValidate() ) {
+
+        alert(`Dziękujęmy za złożenie zamówienia o wartości ${orderTotalValue}. Wszelkie szczegóły zamówienia zostały wysłane na adres email: ${userEmail}`)
+        clearOrderFormField();
+        clearExcursionListInSummary();
+        hideSummary();
     }
 }
 
 function orderFormValidate() {
 
-    const nameInputValue = document.querySelector('[name=name]').value;
-    const emailInputValue = document.querySelector('[name=email]').value;
+    clearErrors('[data-order-content]');
+
+    const nameInput = document.querySelector('[name=name]');
+    const nameInputValue = nameInput.value;
+    const emailInput = document.querySelector('[name=email]');
+    const emailInputValue = emailInput.value;
 
     const regEmail = /.+@.+\.[a-z]{2,}/
 
-    if( regEmail.test(emailInputValue) === true || nameInputValue.length > 0) {}
+    if(nameInputValue.length === 0) {
+        addError(nameInput.parentElement , 'That field cannot be empty' , 'data-order-content')
+    }
+
+    if (regEmail.test(emailInputValue) === false) {
+        addError(emailInput.parentElement , 'Invalid email address' , 'data-order-content')
+    }
+
+    if( regEmail.test(emailInputValue) === true && nameInputValue.length > 0) {
+        return true
+    }
 }
 
+function clearOrderFormField() {
+    const nameInputValue = document.querySelector('[name=name]').value = "";
+    const emailInputValue = document.querySelector('[name=email]').value = "";
+
+    cart = []
+}
+
+function clearExcursionListInSummary() {
+
+    const ExcursionListInSummary = document.querySelectorAll('.summary__item');
+
+    for(let i=1; i<ExcursionListInSummary.length; i++) {
+        ExcursionListInSummary[i].remove()
+    }
+}
+
+function hideSummary() {
+    document.querySelector('.summary').style.display = 'none';
+    document.querySelector('.order').style.display = 'none';
+}
