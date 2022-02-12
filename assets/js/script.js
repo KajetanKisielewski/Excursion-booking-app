@@ -4,14 +4,14 @@ let cart = [];
 function init() {
 
     const fileEl = document.querySelector('.uploader__input');
-    const excursions = document.querySelector('.panel__excursions');
-    const summary = document.querySelector('.panel__form')
+    const excursions = getExcursionPanel();
+    const summary = document.querySelector('.panel__form');
 
     fileEl.addEventListener('change' , readFile);
     excursions.addEventListener('click' , selectExcursion);
     excursions.addEventListener('submit' , setSummaryDetails);
     summary.addEventListener('click' , removeExcursion);
-    summary.addEventListener('submit' , sendOrder)
+    summary.addEventListener('submit' , sendOrder);
 }
 
 function readFile(e) {
@@ -23,11 +23,11 @@ function readFile(e) {
 
         reader.onload = function(readerEvent) {
             const content = readerEvent.target.result;
-            const rowsInContent = content.split(/[\r\n]+/gm);
+            const rowsInContent = splitContentForRows(content);
 
-            rowsInContent.forEach( function(element) {
-                const excursion = element.substr(1, element.length-2).split(/["+"]\W+/);
-                setExcursionDetails(excursion);
+            rowsInContent.forEach( function(data) {
+                const excursionData = prepereExcursionData(data);
+                renderExcursion(excursionData);
             } );
             showCurrentExcursion();
         };
@@ -38,169 +38,260 @@ function readFile(e) {
     }
 }
 
-function setExcursionDetails(item) {
+function renderExcursion(excursionData) {
+    const excursionItem = createExcursionItem();
+    setExcursionDetails(excursionData, excursionItem);
+    addIntoExcursionPanel(excursionItem);
+}
 
-    const excursionDetailsPrototype = document.querySelector('.excursions__item');
+function setExcursionDetails(excursionData, excursionItem) {
+    setExcursionID(excursionData, excursionItem);
+    setExcursionTitle(excursionData, excursionItem);
+    setExcursionDescription(excursionData, excursionItem);
+    setExcursionPrice(excursionData, excursionItem);
+}
 
-    const excursionDetails = excursionDetailsPrototype.cloneNode(true);
-    excursionDetails.classList.remove('excursions__item--prototype');
-    excursionDetails.dataset.id = item[0];
-
-    const excursionTitle = excursionDetails.querySelector('.excursions__title--content');
-    excursionTitle.innerText = item[1];
-
-    const excursionDescription = excursionDetails.querySelector('.excursions__description');
-    excursionDescription.innerText = item[2];
-
-    const excursionPrice = excursionDetails.querySelectorAll('.excursions__price');
-
-    const excursionAdultPrice = excursionPrice[0];
-    excursionAdultPrice.innerText = item[3];
-
-    const excursionChildrenPrice = excursionPrice[1];
-    excursionChildrenPrice.innerText = item[4];
-
-    excursionDetailsPrototype.parentElement.appendChild(excursionDetails);
+function addIntoExcursionPanel(excursionItem) {
+    const excursionItemPrototype = getExcursionItemPrototype();
+    excursionItemPrototype.parentElement.appendChild(excursionItem);
 }
 
 function showCurrentExcursion() {
-
-    const mainPanel = document.querySelector('.panel');
-    mainPanel.style.justifyContent = "space-between";
-
-    const excursionBoard = document.querySelector('.panel__excursions');
-    excursionBoard.style.display = "flex"
-
-    const currentExcursion = document.querySelector('.excursions__item--prototype').nextElementSibling;
-    currentExcursion.classList.add('excursions__item--current');
+    const currentExcursion = getExcursionItemPrototype().nextElementSibling;
+    toggleCurrentClass(currentExcursion);
+    setPanelsVisibility();
 }
 
 function selectExcursion(e) {
-
     if(e.target.classList.contains('fa-arrow-right')) {
         selectNextExcursion();
+        clearExcursionFormField();
     }
-
     if(e.target.classList.contains('fa-arrow-left')) {
         selectPreviousExcursion();
+        clearExcursionFormField()
     }
 
     clearErrors('[data-excursion-content]');
 }
 
 function selectNextExcursion() {
-
-    const currentExcursion = document.querySelector('.excursions__item--current');
-
+    const currentExcursion = getCurrentExcursion();
     const nextExcursion = currentExcursion.nextElementSibling;
+    const firstExcursions = getExcursionItemPrototype().nextElementSibling;
 
-    if(nextExcursion !== null) {
-        currentExcursion.classList.remove('excursions__item--current');
-        nextExcursion.classList.add('excursions__item--current');
-    }
-
-    if(nextExcursion === null) {
-        const firstExcursions = document.querySelector('.excursions__item--prototype').nextElementSibling;
-        currentExcursion.classList.remove('excursions__item--current');
-        firstExcursions.classList.add('excursions__item--current');
-    }
+    nextExcursion === null ? setFirstExcursion(currentExcursion , firstExcursions) : setNextExcursion(currentExcursion , nextExcursion);
 }
 
 function selectPreviousExcursion() {
-
-    const currentExcursion = document.querySelector('.excursions__item--current');
-
+    const currentExcursion = getCurrentExcursion();
     const previousExcursion = currentExcursion.previousElementSibling;
+    const lastExcursions = getExcursionPanel().lastElementChild;
 
-    if(previousExcursion !== null) {
-        currentExcursion.classList.remove('excursions__item--current');
-        previousExcursion.classList.add('excursions__item--current');
-    }
+    previousExcursion === null ? setLastExcursion(currentExcursion, lastExcursions) : setPreviousExcursion(currentExcursion, previousExcursion);
+}
 
-    if(previousExcursion === null) {
-        const lastExcursions = document.querySelector('.panel__excursions').lastElementChild;
-        currentExcursion.classList.remove('excursions__item--current');
-        lastExcursions.classList.add('excursions__item--current');
-    }
+function setNextExcursion(currentExcursion, nextExcursion) {
+    toggleCurrentClass(currentExcursion);
+    toggleCurrentClass(nextExcursion);
+}
+
+function setFirstExcursion(currentExcursion, firstExcursions) {
+    toggleCurrentClass(currentExcursion);
+    toggleCurrentClass(firstExcursions);
+}
+
+
+function setPreviousExcursion(currentExcursion, previousExcursion) {
+    toggleCurrentClass(currentExcursion);
+    toggleCurrentClass(previousExcursion);
+}
+
+function setLastExcursion(currentExcursion, lastExcursion) {
+    toggleCurrentClass(currentExcursion);
+    toggleCurrentClass(lastExcursion);
+}
+
+function getExcursionPanel() {
+    return document.querySelector('.panel__excursions');
+}
+
+function getCurrentExcursion() {
+    return document.querySelector('.excursions__item--current');
+}
+
+function toggleCurrentClass(item) {
+    item.classList.contains('excursions__item--current') ? item.classList.remove('excursions__item--current') : item.classList.add('excursions__item--current');
+}
+
+function setPanelsVisibility() {
+    const mainPanel = document.querySelector('.panel');
+    mainPanel.style.justifyContent = "space-between";
+
+    const excursionPanel = getExcursionPanel();
+    excursionPanel.style.display = "flex";
+}
+
+function setExcursionID(excursionData, excursionItem) {
+    excursionItem.dataset.id = excursionData[0];
+}
+
+function setExcursionTitle(excursionData, excursionItem) {
+    const excursionTitle = excursionItem.querySelector('.excursions__title--content');
+    excursionTitle.innerText = excursionData[1];
+}
+
+function setExcursionDescription(excursionData, excursionItem) {
+    const excursionDescription = excursionItem.querySelector('.excursions__description');
+    excursionDescription.innerText = excursionData[2];
+}
+
+function setExcursionPrice(excursionData, excursionItem) {
+    const excursionPrice = excursionItem.querySelectorAll('.excursions__price');
+
+    const excursionAdultPrice = excursionPrice[0];
+    excursionAdultPrice.innerText = excursionData[3];
+
+    const excursionChildrenPrice = excursionPrice[1];
+    excursionChildrenPrice.innerText = excursionData[4];
+}
+
+function createExcursionItem() {
+    const excursionItem = getExcursionItemPrototype().cloneNode(true);
+    excursionItem.classList.remove('excursions__item--prototype');
+    return excursionItem;
+}
+
+function getExcursionItemPrototype() {
+    return document.querySelector('.excursions__item--prototype');
+}
+
+function prepereExcursionData(element) {
+    return element.substr(1, element.length-2).split(/["+"]\W+/);
+}
+
+function splitContentForRows(content) {
+    return content.split(/[\r\n]+/gm);
 }
 
 function setSummaryDetails(e) {
     e.preventDefault();
 
-    if( getCurrentExcursionDetails() ) {
-        addExcursionIntoSummary(cart);
+    if( validateExcursionDetails() ) {
+        addExcursionToCart();
+        renderSummaryItem(cart);
         setOrderTotalPrice(cart);
+        clearExcursionFormField()
     }
 }
 
-function getCurrentExcursionDetails() {
+function validateExcursionDetails() {
 
-    clearErrors('[data-excursion-content]');
-
-    const currentExcursion = document.querySelector('.excursions__item--current');
-
-    const currentExcursionName = currentExcursion.querySelector('.excursions__title--content').innerText;
-
-    const currentExcursionPrices = currentExcursion.querySelectorAll('.excursions__price');
-    const currentExcursionAdultPrice = currentExcursionPrices[0].innerText;
-    const currentExcursionChildrenPrice = currentExcursionPrices[1].innerText;
-
-    const currentExcursionAdultNumber = currentExcursion.querySelector('[name=adults]');
-    const currentExcursionAdultNumberValue = currentExcursionAdultNumber.value;
-
-    const currentExcursionChildrenNumber = currentExcursion.querySelector('[name=children]')
-    const currentExcursionChildrenNumberValue = currentExcursionChildrenNumber.value;
-
-     if( isNumber(currentExcursionAdultNumberValue) === false || currentExcursionAdultNumberValue.trim() === '') {
-        addError(currentExcursionAdultNumber.parentElement , 'Number of adult must be integer number' , 'data-excursion-content');
-     }
-
-     if( isNumber(currentExcursionChildrenNumberValue) === false || currentExcursionChildrenNumberValue.trim() === '' ) {
-        addError(currentExcursionChildrenNumber.parentElement , 'Number of children must be integer number' , 'data-excursion-content');
-     }
-
-    if ( isNumber(currentExcursionAdultNumberValue) === true && isNumber(currentExcursionChildrenNumberValue) === true ){
-
-        const currentExcursionDetails =
-        {
-        title: currentExcursionName,
-        adultPrice: currentExcursionAdultPrice,
-        adultNumber: currentExcursionAdultNumberValue,
-        childPrice: currentExcursionChildrenPrice,
-        childNumber: currentExcursionChildrenNumberValue,
-        id: Math.round( Math.random() * 10000 ),
-        }
-
-        cart.push(currentExcursionDetails);
-
+    if( !isInteger( getCurrentExcursionAdultNumberValue() )) {
+        addError( getCurrentExcursionAdultNumberField(), 'Number of adult must be integer number' , 'data-excursion-content');
+    }
+    if( !isInteger( getCurrentExcursionChildrenNumberValue() )) {
+        addError( getCurrentExcursionChildrenNumberField(), 'Number of children must be integer number' , 'data-excursion-content');
+    }
+    if ( isInteger( getCurrentExcursionAdultNumberValue() ) && isInteger( getCurrentExcursionChildrenNumberValue() ) ) {
         return true
     }
-
 }
 
-function isNumber(item) {
+function addExcursionToCart() {
+    const currentExcursionDetails = createCurrentExcursionDetails();
+    cart.push( currentExcursionDetails );
+}
 
+function renderSummaryItem(data) {
+    const summaryItem = createSummaryItem();
+    setSummaryItemDetails(data, summaryItem);
+    addIntoSummaryPanel(summaryItem);
+    schowSummaryPanel();
+}
+
+function setOrderTotalPrice(data) {
+    const orderTotalPrice = getOrderTotalPriceField();
+    let price = "";
+
+    for(let i=0; i<data.length; i++) {
+        price = parseInt(price + (data[i].adultPrice * data[i].adultNumber + data[i].childPrice * data[i].childNumber));
+    }
+    orderTotalPrice.innerText = `${price} PLN`;
+}
+
+function clearExcursionFormField() {
+    getCurrentExcursionAdultNumberField().value = "";
+    getCurrentExcursionChildrenNumberField().value = "";
+}
+
+function createCurrentExcursionDetails() {
+
+    return currentExcursionDetails = {
+        title: getCurrentExcursionName(),
+        adultPrice: getCurrentExcursionAdultPrice(),
+        adultNumber: getCurrentExcursionAdultNumberValue(),
+        childPrice: getCurrentExcursionChildrenPrice(),
+        childNumber: getCurrentExcursionChildrenNumberValue(),
+        id: Math.round( Math.random() * 10000 ),
+    };
+}
+
+function getCurrentExcursionName() {
+    const currentExcursion = getCurrentExcursion();
+    return currentExcursion.querySelector('.excursions__title--content').innerText;
+}
+
+function getCurrentExcursionPrices() {
+    const currentExcursion = getCurrentExcursion();
+    return currentExcursion.querySelectorAll('.excursions__price');
+}
+
+function getCurrentExcursionAdultPrice() {
+    const currentExcursionPrices = getCurrentExcursionPrices();
+    return currentExcursionPrices[0].innerText;
+}
+
+function getCurrentExcursionChildrenPrice() {
+    const currentExcursionPrices = getCurrentExcursionPrices();
+    return currentExcursionPrices[1].innerText;
+}
+
+function getCurrentExcursionAdultNumberField() {
+    const currentExcursion = getCurrentExcursion();
+    return currentExcursion.querySelector('[name=adults]');
+}
+
+function getCurrentExcursionAdultNumberValue() {
+    return getCurrentExcursionAdultNumberField().value;
+}
+
+function getCurrentExcursionChildrenNumberField() {
+    const currentExcursion = getCurrentExcursion();
+    return currentExcursion.querySelector('[name=children]');
+}
+
+function getCurrentExcursionChildrenNumberValue() {
+    return getCurrentExcursionChildrenNumberField().value;
+}
+
+function isInteger(item) {
     const itemWithoutWhiteSpaces = item.trim();
 
     if( itemWithoutWhiteSpaces.length !== 0 ) {
-
         const num = Number( item );
 
-        if( !Number.isNaN(num) && Number.isInteger(num) && num >= 0 ) {
-            return true;
-        }
-        else{
-            return false;
-        }
-}
+        if( !Number.isNaN(num) && Number.isInteger(num) && num >= 0 ) { return true; }
+        return false;
+    }
+    return false
 }
 
 function addError(item, errorText, dataName) {
-   item.parentElement.setAttribute(dataName , errorText);
+   item.parentElement.parentElement.setAttribute(dataName , errorText);
 }
 
 function clearErrors(data) {
-
     const errorList = document.querySelectorAll(data);
 
     if( data === '[data-excursion-content]') {
@@ -208,7 +299,6 @@ function clearErrors(data) {
            el.dataset.excursionContent = ""
         })
     }
-
     if( data === '[data-order-content]') {
        errorList.forEach( function(el) {
            el.dataset.orderContent = ""
@@ -216,46 +306,69 @@ function clearErrors(data) {
    }
 }
 
-function addExcursionIntoSummary(item) {
-    const summaryDetailsPrototype = document.querySelector('.summary__item--prototype');
+function setSummaryItemDetails(data, summaryItem) {
+    setSummaryItemID(data, summaryItem);
+    setSummaryItemTitle(data, summaryItem);
+    setSummaryPrices(data, summaryItem);
+}
 
-    const summaryDetails = summaryDetailsPrototype.cloneNode(true);
-    summaryDetails.classList.remove('summary__item--prototype');
-    summaryDetails.dataset.id = item[item.length - 1].id;
+function setSummaryItemID(data, summaryItem) {
+    summaryItem.dataset.id = data[data.length - 1].id;
+}
 
-    const summaryName = summaryDetails.querySelector('.summary__name');
-    summaryName.innerText = item[item.length - 1].title
+function setSummaryItemTitle(data, summaryItem) {
+    const summaryTitle = summaryItem.querySelector('.summary__name');
+    summaryTitle.innerText = data[data.length - 1].title;
+}
 
-    const summaryAdultsPrices = summaryDetails.querySelector('.summary__prices--adults');
-    summaryAdultsPrices.innerText = `Dorosły: ${item[item.length - 1].adultNumber} x ${item[item.length - 1].adultPrice} PLN`
+function setSummaryPrices(data, summaryItem) {
+    const summaryAdultsPrices = summaryItem.querySelector('.summary__prices--adults');
+    summaryAdultsPrices.innerText = `Dorosły: ${data[data.length - 1].adultNumber} x ${data[data.length - 1].adultPrice} PLN`;
 
-    const summaryChildrenPrices = summaryDetails.querySelector('.summary__prices--children');
-    summaryChildrenPrices.innerText = `Dziecko: ${item[item.length - 1].childNumber} x ${item[item.length - 1].childPrice} PLN`
+    const summaryChildrenPrices = summaryItem.querySelector('.summary__prices--children');
+    summaryChildrenPrices.innerText = `Dziecko: ${data[data.length - 1].childNumber} x ${data[data.length - 1].childPrice} PLN`;
 
-    const summaryTotalPrice = summaryDetails.querySelector('.summary__total-price');
-
-    const CalculatedTotalPrice = item[item.length - 1].adultNumber * item[item.length - 1].adultPrice + item[item.length - 1].childNumber * item[item.length - 1].childPrice;
+    const summaryTotalPrice = summaryItem.querySelector('.summary__total-price');
+    const CalculatedTotalPrice = data[data.length - 1].adultNumber * data[data.length - 1].adultPrice + data[data.length - 1].childNumber * data[data.length - 1].childPrice;
 
     summaryTotalPrice.innerText = `${CalculatedTotalPrice} PLN`;
-
-    summaryDetailsPrototype.parentElement.appendChild(summaryDetails);
-
-    schowSummary();
 }
 
-function schowSummary() {
-    document.querySelector('.summary').style.display = 'block';
-    document.querySelector('.order').style.display = 'block';
+function createSummaryItem() {
+    const summaryItem = getSummaryItemPrototype().cloneNode(true);
+    summaryItem.classList.remove('summary__item--prototype');
+    return summaryItem;
 }
 
-function setOrderTotalPrice(item) {
-    const orderTotalPrice = document.querySelector('.order__total-price-value');
-    let price = "";
+function getSummaryItemPrototype() {
+    return document.querySelector('.summary__item--prototype');
+}
 
-   for(let i=0; i<item.length; i++) {
-       price = parseInt(price + (item[i].adultPrice * item[i].adultNumber + item[i].childPrice * item[i].childNumber));
-    }
-    orderTotalPrice.innerText = `${price} PLN`;
+function addIntoSummaryPanel(summaryItem) {
+    const summaryItemPrototype = getSummaryItemPrototype();
+    summaryItemPrototype.parentElement.appendChild(summaryItem);
+}
+
+function schowSummaryPanel() {
+    getSummaryPanel().style.display = 'block';
+    getOrderPanel().style.display = 'block';
+}
+
+function hideSummaryPanel() {
+    getSummaryPanel().style.display = 'none';
+    getOrderPanel().style.display = 'none';
+}
+
+function getSummaryPanel() {
+    return document.querySelector('.summary');
+}
+
+function getOrderPanel() {
+    return document.querySelector('.order');
+}
+
+function getOrderTotalPriceField() {
+    return document.querySelector('.order__total-price-value');
 }
 
 function removeExcursion(e) {
@@ -265,61 +378,53 @@ function removeExcursion(e) {
 
         for(const el in cart) {
             if( cart[el].id === deletedExcursionId ) {
-              cart.splice(el , 1)
+              cart.splice(el , 1);
               setOrderTotalPrice(cart);
             }
         }
         e.target.parentElement.parentElement.remove();
     }
 }
-
 function sendOrder(e) {
-    e.preventDefault()
+    e.preventDefault();
 
-    const orderTotalValue = document.querySelector('.order__total-price-value').innerText
-    const userEmail = document.querySelector('[name=email]').value;
+    const orderTotalValue = getOrderTotalPriceField().innerText;
+    const userEmailValue = getEmailInput().value;
 
     if ( orderFormValidate() ) {
 
-        alert(`Dziękujęmy za złożenie zamówienia o wartości ${orderTotalValue}. Wszelkie szczegóły zamówienia zostały wysłane na adres email: ${userEmail}`)
+        alert(`Dziękujęmy za złożenie zamówienia o wartości ${orderTotalValue}. Wszelkie szczegóły zamówienia zostały wysłane na adres email: ${userEmailValue}`)
         clearOrderFormField();
         clearExcursionListInSummary();
-        hideSummary();
+        hideSummaryPanel();
+        cart = [];
     }
 }
 
 function orderFormValidate() {
-
     clearErrors('[data-order-content]');
 
-    const nameInput = document.querySelector('[name=name]');
-    const nameInputValue = nameInput.value;
-    const emailInput = document.querySelector('[name=email]');
-    const emailInputValue = emailInput.value;
-
+    const nameInputValue = getNameInput().value;
+    const emailInputValue = getEmailInput().value;
     const regEmail = /.+@.+\.[a-z]{2,}/
 
     if(nameInputValue.length === 0) {
-        addError(nameInput.parentElement , 'That field cannot be empty' , 'data-order-content')
+        addError( getNameInput(), 'That field cannot be empty' , 'data-order-content');
     }
-
     if (regEmail.test(emailInputValue) === false) {
-        addError(emailInput.parentElement , 'Invalid email address' , 'data-order-content')
+        addError( getEmailInput(), 'Invalid email address' , 'data-order-content');
     }
-
-    if( regEmail.test(emailInputValue) === true && nameInputValue.length > 0) {
+    if( regEmail.test(emailInputValue) && nameInputValue.length > 0) {
         return true
     }
 }
 
 function clearOrderFormField() {
-    const nameInputValue = document.querySelector('[name=name]').value = "";
-    const emailInputValue = document.querySelector('[name=email]').value = "";
-    cart = [];
+    getNameInput().value = "";
+    getEmailInput().value = "";
 }
 
 function clearExcursionListInSummary() {
-
     const ExcursionListInSummary = document.querySelectorAll('.summary__item');
 
     for(let i=1; i<ExcursionListInSummary.length; i++) {
@@ -327,7 +432,12 @@ function clearExcursionListInSummary() {
     }
 }
 
-function hideSummary() {
-    document.querySelector('.summary').style.display = 'none';
-    document.querySelector('.order').style.display = 'none';
+function getNameInput() {
+    return document.querySelector('[name=name]');
 }
+
+function getEmailInput() {
+    return document.querySelector('[name=email]');
+}
+
+

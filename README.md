@@ -1,6 +1,6 @@
 > ⭐ ***README** to coś więcej niż opis. Poprzez nie **pokazujesz swoje mocne strony** – swoją dokładność, sposób myślenia i podejście do rozwiązywania problemów. Niech Twoje README pokaże, że masz **świetne predyspozycje do rozwoju!***
-> 
-> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.* 
+>
+> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.*
 
 &nbsp;
 
@@ -9,7 +9,7 @@
 
 Zdobyliśmy zlecenie, które zostało porzucone przez poprzedniego programistę, a polega na składaniu zamówienia na wycieczki, które są importowane z pliku CSV.
 
-Mamy cześć kodu HTML i CSS napisanego. Naszym zadaniem będzie utworzenie logiki i prezentacji. 
+Mamy cześć kodu HTML i CSS napisanego. Naszym zadaniem będzie utworzenie logiki i prezentacji.
 
 To oznacza, że tym razem nie tylko działamy w JavaScript, ale będziemy musieli ostylować wg. własnego uznania poszczególne elementy, aby lepiej się prezentowanły.
 
@@ -31,11 +31,11 @@ Przed wysłanie formularza musimy sprawdzić czy pola zostały prawidłowo wype�
 
 Jeśli dane są nie poprawne to należy utworzyć w kodzie HTML stosowne miejsce i tam dodawać odpowiednie komunikaty.
 
-Gdy wszystko przebiegło prawidłowo należy wykorzystać `alert()` w celu wyświetlenia komunikatu: 
+Gdy wszystko przebiegło prawidłowo należy wykorzystać `alert()` w celu wyświetlenia komunikatu:
 
 > Dziękujęmy za złożenie zamówienia o wartości 199PLN. Wszelkie szczegóły zamówienia zostały wysłane na adres email: adres@wpisanywformularzu.pl.
 
-Natomiast formularz jak również lista wybranych wycieczek zostaje wyczyszczona. 
+Natomiast formularz jak również lista wybranych wycieczek zostaje wyczyszczona.
 
 ## Implementacja
 
@@ -115,6 +115,6 @@ Docelowo mają być one niewidoczne - możesz je ukryć przy pomocy CSS (`displa
 &nbsp;
 
 > ⭐ ***README** to coś więcej niż opis. Poprzez nie **pokazujesz swoje mocne strony** – swoją dokładność, sposób myślenia i podejście do rozwiązywania problemów. Niech Twoje README pokaże, że masz **świetne predyspozycje do rozwoju!***
-> 
-> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.* 
+>
+> 🎁 *Zacznij od razu. Skorzystaj z **[szablonu README i wskazówek](https://github.com/devmentor-pl/readme-template)**.*
 
