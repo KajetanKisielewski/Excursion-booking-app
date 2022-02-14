@@ -75,6 +75,7 @@ function selectExcursion(e) {
     clearErrors('[data-excursion-content]');
 }
 
+
 function selectNextExcursion() {
     const currentExcursion = getCurrentExcursion();
     const nextExcursion = currentExcursion.nextElementSibling;
@@ -88,7 +89,7 @@ function selectPreviousExcursion() {
     const previousExcursion = currentExcursion.previousElementSibling;
     const lastExcursions = getExcursionPanel().lastElementChild;
 
-    previousExcursion === null ? setLastExcursion(currentExcursion, lastExcursions) : setPreviousExcursion(currentExcursion, previousExcursion);
+    previousExcursion === getExcursionItemPrototype() ? setLastExcursion(currentExcursion, lastExcursions) : setPreviousExcursion(currentExcursion, previousExcursion);
 }
 
 function setNextExcursion(currentExcursion, nextExcursion) {
@@ -189,13 +190,13 @@ function validateExcursionDetails() {
 
     if( !isInteger( getCurrentExcursionAdultNumberValue() )) {
         addError( getCurrentExcursionAdultNumberField(), 'Number of adult must be integer number' , 'data-excursion-content');
+        return false;
     }
-    if( !isInteger( getCurrentExcursionChildrenNumberValue() )) {
+    else if( !isInteger( getCurrentExcursionChildrenNumberValue() )) {
         addError( getCurrentExcursionChildrenNumberField(), 'Number of children must be integer number' , 'data-excursion-content');
+        return false;
     }
-    if ( isInteger( getCurrentExcursionAdultNumberValue() ) && isInteger( getCurrentExcursionChildrenNumberValue() ) ) {
-        return true
-    }
+    return true
 }
 
 function addExcursionToCart() {
@@ -280,11 +281,9 @@ function isInteger(item) {
 
     if( itemWithoutWhiteSpaces.length !== 0 ) {
         const num = Number( item );
-
         if( !Number.isNaN(num) && Number.isInteger(num) && num >= 0 ) { return true; }
-        return false;
     }
-    return false
+    return false;
 }
 
 function addError(item, errorText, dataName) {
@@ -299,11 +298,9 @@ function clearErrors(data) {
            el.dataset.excursionContent = ""
         })
     }
-    if( data === '[data-order-content]') {
-       errorList.forEach( function(el) {
-           el.dataset.orderContent = ""
-        })
-   }
+    errorList.forEach( function(el) {
+        el.dataset.orderContent = ""
+     })
 }
 
 function setSummaryItemDetails(data, summaryItem) {
@@ -329,9 +326,9 @@ function setSummaryPrices(data, summaryItem) {
     summaryChildrenPrices.innerText = `Dziecko: ${data[data.length - 1].childNumber} x ${data[data.length - 1].childPrice} PLN`;
 
     const summaryTotalPrice = summaryItem.querySelector('.summary__total-price');
-    const CalculatedTotalPrice = data[data.length - 1].adultNumber * data[data.length - 1].adultPrice + data[data.length - 1].childNumber * data[data.length - 1].childPrice;
+    const calculatedTotalPrice = data[data.length - 1].adultNumber * data[data.length - 1].adultPrice + data[data.length - 1].childNumber * data[data.length - 1].childPrice;
 
-    summaryTotalPrice.innerText = `${CalculatedTotalPrice} PLN`;
+    summaryTotalPrice.innerText = `${calculatedTotalPrice} PLN`;
 }
 
 function createSummaryItem() {
@@ -404,6 +401,7 @@ function sendOrder(e) {
 function orderFormValidate() {
     clearErrors('[data-order-content]');
 
+    console.log(getNameInput())
     const nameInputValue = getNameInput().value;
     const emailInputValue = getEmailInput().value;
     const regEmail = /.+@.+\.[a-z]{2,}/
@@ -425,10 +423,10 @@ function clearOrderFormField() {
 }
 
 function clearExcursionListInSummary() {
-    const ExcursionListInSummary = document.querySelectorAll('.summary__item');
+    const excursionListInSummary = document.querySelectorAll('.summary__item');
 
-    for(let i=1; i<ExcursionListInSummary.length; i++) {
-        ExcursionListInSummary[i].remove()
+    for(let i=1; i<excursionListInSummary.length; i++) {
+        excursionListInSummary[i].remove()
     }
 }
 
