@@ -19,6 +19,13 @@
 
 ![](./assets/img/Animation.gif)
 
+
+### Links:
+
+- Code: [See my code](https://github.com/KajetanKisielewski/Excursion-booking-app)
+- Live: [Check it out](https://kajetankisielewski.github.io/Excursion-booking-app/)
+
+
 ### The challenge
 
 This project was created to develop and improve my skills in JavaScript Forms. The task was to create an application for ordering excursions. Excursions are added to the website by uploading a CSV* file via the form.
@@ -29,16 +36,11 @@ This project was created to develop and improve my skills in JavaScript Forms. T
 
 In the CSV file at every row we have information about single excursion: *ID*, *Excursion name*, *Description*, *Price for adult* and *Price for children*.
 
-After uploading the CSV file, user is able to choose any excursion by entering the number of adult and children and clicked the confirm button **Dodaj do zamówienia**
+After uploading the CSV file, user is able to choose any excursion by entering the number of adult and children and clicked the confirm button * **Dodaj do zamówienia** *
 
-After clicking the confirm button, at summary panel appears chosen excursion, in every moment user can remove excursion by click the **X**. Total Price is dynamicly update.
+After clicking the confirm button, at summary panel appears chosen excursion, in every moment user can remove excursion by click the  * **X** *. Total Price is dynamicly update.
 
-The next step is to fill the form by entering the *name* and *email*, then user must confirm the order by clicking the button **Zamawiam**. If all was do correctly, user get information about thanksing for sumbit an order and sending the details at provided email.
-
-### Links:
-
-- Code: [See my code]()
-- Live: [Check it out]()
+The next step is to fill the form by entering the *name* and *email*, then user must confirm the order by clicking the button * **Zamawiam** *. If all was do correctly, user get information about thanksing for sumbit an order and sending the details at provided email.
 
 ## My Process
 
